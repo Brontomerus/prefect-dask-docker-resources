@@ -17,7 +17,10 @@ The [prefect-dask-docker](./prefect-dask-docker/README.md) is for Dask Execution
 
 # Prefect - Agent
 
-The [prefect-agent-docker](./prefect-agent-docker/README.md) is for running Prefect Agents as a server within your cloud infrastructure. The image is based on Alpine Linux, and is hardened for production deployment. This docker image encapsulates the [Prefect Agent](https://docs.prefect.io/orchestration/agents/overview.html#agent-types), which is essentially an API server with one-way communication following the Hybrid-Execution Model procured by Prefect. Currently, the Agent simply runs on an event loop, but from my experience, is susceptible to falling into disrepair, so I built a mini-server to build and host these agents on whatever infrastructure desired. 
+The [prefect-agent-docker](./prefect-agent-docker/README.md) is for running Prefect Agents as a server within your cloud infrastructure. The image is based on Debian-Slim Linux, and is hardened for production deployment. This docker image encapsulates the [Prefect Agent](https://docs.prefect.io/orchestration/agents/overview.html#agent-types), which is essentially an API server with one-way communication following the Hybrid-Execution Model procured by Prefect. Currently, the Agent simply runs on an event loop, but from my experience, is susceptible to falling into disrepair, so I built a mini-server to build and host these agents on whatever infrastructure desired. 
+
+These images are hosted at [Dockerhub](https://hub.docker.com/repository/docker/brontomerus/prefect-agent/general)
+
 
 
 

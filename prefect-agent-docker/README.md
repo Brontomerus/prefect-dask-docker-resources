@@ -1,7 +1,7 @@
 # Prefect Agent Docker Image
 
 # Description
-This alpine-python base-image is a production ready-ish lean & mean image for operating prefect images wherever you want to run it. This solves the main issue for the [Prefect Agent](https://github.com/PrefectHQ/prefect/blob/master/src/prefect/agent/agent.py) from my experience, where the event loop will often fail or behave inconsistently after some time. This can be a hassle if your agents are running on an internally hosted server within a private subnet, and require manual intervention to resurect the situation.
+This Debian-Slim-python base-image is a production ready-ish lean & mean image for operating prefect images wherever you want to run it. This solves the main issue for the [Prefect Agent](https://github.com/PrefectHQ/prefect/blob/master/src/prefect/agent/agent.py) from my experience, where the event loop will often fail or behave inconsistently after some time. This can be a hassle if your agents are running on an internally hosted server within a private subnet, and require manual intervention to resurect the situation.
 
 
 # Getting Started
@@ -14,7 +14,7 @@ Open the directory on the CLI, and run `docker -f build [Dockerfile.NAME] .` to 
 Building may be tricky for those not familiar with Docker's PID1 or more advanced usage with [tini](https://github.com/krallin/tini) or [supervisord](http://supervisord.org/). Note the **--init** option, because that is essentially telling the image to enter using the tini ENTRYPOINT defined in each Dockerfile.
 
 Example Build:
-`docker run -d --name prefect-agent-container --init -e PREFECT_AGENT=local -e PREFECT_BACKEND=cloud -e PREFECT_CLOUD_TOKEN=[YOUR TOKEN HERE] -e LABELS="-l etl" [YOUR_CONTAINER_NAME_OR_ID]`
+`docker run -d --name prefect-agent-container --init -e PREFECT_AGENT=local -e PREFECT_BACKEND=cloud -e PREFECT_CLOUD_TOKEN=[YOUR TOKEN HERE] -e LABELS="-l etl" [YOUR_IMAGE_NAME_OR_ID]`
 
 Check whether the image started correctly by trying to locate the container "prefect-agent-container":
 `docker ps -a`
@@ -76,5 +76,9 @@ One process per container, everyone knows the rules. While I'm not an expert on 
 
 
 ### 5. Keeping Security in Mind
-Following information [here](https://medium.com/asos-techblog/minimising-your-attack-surface-by-building-highly-specialised-docker-images-example-for-net-b7bb177ab647), shared by author Paulo Gomes, we want to build containers that drop all the jazz so they can be more readily run in production-hardened systems. The Hardened dockerfile references can also be verified on this github repo for [iron-alpine](https://github.com/ironpeakservices/iron-alpine/blob/master/Dockerfile#L45)
+Following information [here](https://medium.com/asos-techblog/minimising-your-attack-surface-by-building-highly-specialised-docker-images-example-for-net-b7bb177ab647), shared by author Paulo Gomes, we want to build containers that drop all the jazz so they can be more readily run in production-hardened systems. The Hardened dockerfile references can also be verified for alpine linux on this github repo for [iron-alpine](https://github.com/ironpeakservices/iron-Debian-Slim/blob/master/Dockerfile#L45)
 
+
+
+### A bit of a warning
+Pandas and Numpy (Both Dask Dependencies) take __ages__ to install. This is normal behavior for Alpine Linux and is the price of admission for awesome slim containers. Kind of annoying though...

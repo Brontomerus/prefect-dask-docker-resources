@@ -1,15 +1,14 @@
-FROM python:3.9-alpine
+FROM python:3.9-slim
 
 # install some stuff
-RUN apk update \
-    && apk add --no-cache linux-headers build-base tini \
-    && pip install --no-cache-dir prefect[aws] s3fs tini
-
+RUN apt-get update \
+    && apt-get install tini \
+    && pip install --no-cache-dir prefect[aws] s3fs tini 
 
 # Harden Image and Start Agent script
-COPY entrypoint/setup.sh /bin/setup.sh
+COPY setup.sh /bin/setup.sh
 RUN chmod +x /bin/setup.sh
 
 
 # ENTRYPOINT / RUN
-ENTRYPOINT ["/sbin/tini", "-s", "-g", "--", "/bin/setup.sh"]
+ENTRYPOINT ["/usr/bin/tini", "-s", "-g", "--", "/bin/setup.sh"]
