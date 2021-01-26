@@ -8,6 +8,7 @@ RUN apt-get update \
 # Harden Image and Start Agent script
 COPY setup.sh /bin/setup.sh
 RUN chmod +x /bin/setup.sh
+ENV INFRASTRUCTURE=aws
 
 
 # ENTRYPOINT / RUN

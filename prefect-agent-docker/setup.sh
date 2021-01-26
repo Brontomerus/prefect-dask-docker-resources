@@ -14,8 +14,22 @@ if [ "$EXTRA_PIP_PACKAGES" ]; then
     pip install --no-cache $EXTRA_PIP_PACKAGES
 fi
 
-
-
+# if [ "$INFRASTRUCTURE" ]; then
+#   case "$INFRASTRUCTURE" in
+#     "aws")
+#         export PREFECT__CONTEXT__SECRETS__AWS_CREDENTIALS='{"ACCESS_KEY": "$AWS_ACCESS_KEY_ID", "SECRET_ACCESS_KEY": "$AWS_SECRET_ACCESS_KEY"}'
+#         ;;
+#     "azure")
+#         Statement(s) to be executed if pattern2 matches
+#         ;;
+#     "google")
+#         Statement(s) to be executed if pattern3 matches
+#         ;;
+#     *)
+#       Default condition to be executed
+#       ;;
+#   esac
+# fi
 
 # Harden the Image
 
@@ -167,6 +181,16 @@ rm -rf usr/local/games
 # ...
 
 
+
+
+
+if [ "$PREFECT_AGENT_NAME" ]; then
+    echo "PREFECT_AGENT_NAME environment variable found."
+else
+    echo "No PREFECT_AGENT_NAME environment variable found.  Setting default: container-agent."
+    export PREFECT_AGENT_NAME=container-agent
+fi
+
 if [ "$PREFECT_BACKEND" ]; then
     echo "PREFECT_BACKEND environment variable found.  Setting backend."
     prefect backend $PREFECT_BACKEND
@@ -179,8 +203,8 @@ fi
 if [ "$PREFECT_AGENT" ] && [ "$PREFECT_CLOUD_TOKEN" ]; then
     echo "PREFECT_AGENT environment variable found.  Starting Agent on PID1."
     prefect agent $PREFECT_AGENT start \
-        --name container-agent \
-        -t $PREFECT_CLOUD_TOKEN \
+        --name $PREFECT_AGENT_NAME \
+        --token $PREFECT_CLOUD_TOKEN \
         $LABELS
 else
     echo "PREFECT_AGENT  environment variable found but no cloud token.  Running additional diagnostics."

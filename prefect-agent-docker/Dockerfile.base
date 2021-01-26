@@ -12,3 +12,4 @@ RUN chmod +x /bin/setup.sh
 
 # ENTRYPOINT / RUN
 # ENTRYPOINT ["/usr/bin/tini", "-s", "-g", "--", "/bin/setup.sh"]
+

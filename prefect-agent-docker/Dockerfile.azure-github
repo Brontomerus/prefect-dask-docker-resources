@@ -9,6 +9,7 @@ RUN apk update \
 # Harden Image and Start Agent script
 COPY entrypoint/setup.sh /bin/setup.sh
 RUN chmod +x /bin/setup.sh
+ENV INFRASTRUCTURE=azure
 
 
 # ENTRYPOINT / RUN
