@@ -3,12 +3,12 @@ FROM python:3.9-slim
 # install some stuff
 RUN apt-get update \
     && apt-get install tini \
-    && pip install --no-cache-dir prefect[azure] tini 
+    && pip install --no-cache-dir prefect[aws] PyGithub dask-cloudprovider[aws] dask[complete] s3fs tini 
 
 # Harden Image and Start Agent script
 COPY setup.sh /bin/setup.sh
 RUN chmod +x /bin/setup.sh
-ENV INFRASTRUCTURE=azure
+ENV INFRASTRUCTURE=aws
 
 
 # ENTRYPOINT / RUN
