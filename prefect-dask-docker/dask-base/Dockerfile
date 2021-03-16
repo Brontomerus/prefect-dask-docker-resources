@@ -1,15 +1,25 @@
-FROM python:3.9-slim
+FROM continuumio/miniconda3:4.8.2
 
-# install some stuff
-RUN apt-get update \
-    && apt-get install tini \
-    && pip install --no-cache-dir prefect[aws] PyGithub dask-cloudprovider[aws] dask[complete] s3fs tini 
+RUN conda install --yes \
+    -c conda-forge \
+    python==3.8 \
+    python-blosc \
+    cytoolz \
+    dask==2021.3.0 \
+    lz4 \
+    nomkl \
+    numpy==1.18.1 \
+    pandas==1.0.1 \
+    tini==0.18.0 \
+    && conda clean -tipsy \
+    && find /opt/conda/ -type f,l -name '*.a' -delete \
+    && find /opt/conda/ -type f,l -name '*.pyc' -delete \
+    && find /opt/conda/ -type f,l -name '*.js.map' -delete \
+    && find /opt/conda/lib/python*/site-packages/bokeh/server/static -type f,l -name '*.js' -not -name '*.min.js' -delete \
+    && rm -rf /opt/conda/pkgs
 
-# Harden Image and Start Agent script
-COPY setup.sh /bin/setup.sh
-RUN chmod +x /bin/setup.sh
-ENV INFRASTRUCTURE=aws
+COPY prepare.sh /usr/bin/prepare.sh
 
+RUN mkdir /opt/app
 
-# ENTRYPOINT / RUN
-ENTRYPOINT ["/usr/bin/tini", "-s", "-g", "--", "/bin/setup.sh"]
+ENTRYPOINT ["tini", "-g", "--", "/usr/bin/prepare.sh"]

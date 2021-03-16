@@ -1,9 +1,9 @@
-FROM python:3.9-slim
+FROM python:3.8-slim
 
 # install some stuff
 RUN apt-get update \
     && apt-get install tini \
-    && pip install --no-cache-dir prefect[aws] PyGithub dask-cloudprovider[aws] dask[complete] s3fs tini 
+    && pip install --no-cache-dir prefect[aws] PyGithub dask-cloudprovider[aws] dask[complete] s3fs pyarrow tini 
 
 # Harden Image and Start Agent script
 COPY setup.sh /bin/setup.sh
