@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3:4.8.2
+FROM continuumio/miniconda3:4.9.2
 
 RUN conda install --yes \
     -c conda-forge \
@@ -10,6 +10,8 @@ RUN conda install --yes \
     nomkl \
     numpy==1.18.1 \
     pandas==1.0.1 \
+    s3fs==0.5.2 \
+    pyarrow==3.0.0 \
     tini==0.18.0 \
     && conda clean -tipsy \
     && find /opt/conda/ -type f,l -name '*.a' -delete \
@@ -18,8 +20,8 @@ RUN conda install --yes \
     && find /opt/conda/lib/python*/site-packages/bokeh/server/static -type f,l -name '*.js' -not -name '*.min.js' -delete \
     && rm -rf /opt/conda/pkgs
 
-COPY prepare.sh /usr/bin/prepare.sh
+COPY setup.sh /usr/bin/setup.sh
 
 RUN mkdir /opt/app
 
-ENTRYPOINT ["tini", "-g", "--", "/usr/bin/prepare.sh"]
+ENTRYPOINT ["tini", "-g", "--", "/usr/bin/setup.sh"]
