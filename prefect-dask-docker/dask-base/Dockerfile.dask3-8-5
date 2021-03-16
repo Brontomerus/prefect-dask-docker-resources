@@ -20,8 +20,11 @@ RUN conda install --yes \
     && find /opt/conda/lib/python*/site-packages/bokeh/server/static -type f,l -name '*.js' -not -name '*.min.js' -delete \
     && rm -rf /opt/conda/pkgs
 
-COPY setup.sh /usr/bin/setup.sh
+COPY setup.sh /bin/setup.sh
 
-RUN mkdir /opt/app
+RUN chmod +xr /bin/setup.sh \
+    && mkdir /opt/app 
+    
 
-ENTRYPOINT ["tini", "-g", "--", "/usr/bin/setup.sh"]
+
+ENTRYPOINT ["tini", "-g", "--", "/bin/setup.sh"]

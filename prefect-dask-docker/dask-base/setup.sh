@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # copied this from dask's base image here: https://github.com/dask/dask-docker/blob/main/base/prepare.sh
-# wanted to emulate their process but have my own container to guard against sudden changes
+# wanted to emulate their process but have my own container to guard against sudden changes. Made some minor updates in this.
 set -x
 
 # We start by adding extra apt packages, since pip modules may required library
@@ -25,14 +25,16 @@ fi
 
 if [ "$EXTRA_PIP_PACKAGES" ]; then
     echo "EXTRA_PIP_PACKAGES environment variable found.  Installing".
-    /opt/conda/bin/pip install $EXTRA_PIP_PACKAGES
+    echo "installing the following packages: " 
+    python -m pip install -U pip
+    /opt/conda/bin/pip install --no-cache $EXTRA_PIP_PACKAGES
 fi
 
 # Run extra commands
 exec "$@"
 
 
-
+# echo "its running, yo"
 # # Harden the Image
 
 # # removing pip
