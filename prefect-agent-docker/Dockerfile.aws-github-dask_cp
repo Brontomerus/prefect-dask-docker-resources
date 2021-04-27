@@ -3,7 +3,7 @@ FROM python:3.8.0-slim
 # install some stuff
 RUN apt-get update \
     && apt-get install tini \
-    && pip install --no-cache-dir prefect[aws] PyGithub dask-cloudprovider[aws] dask[complete] s3fs pyarrow tini 
+    && pip install --no-cache-dir "prefect[aws]==0.14.16" "PyGithub" "distributed==2021.2.0" "dask-cloudprovider[aws]" "dask[complete]==2021.2.0" "s3fs==0.5.2" "pyarrow==3.0.0" "tini" "aiobotocore==1.3.0" "botocore==1.20.49" "boto3<=1.17.49"
 
 # Harden Image and Start Agent script
 COPY setup.sh /bin/setup.sh
