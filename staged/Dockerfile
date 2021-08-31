@@ -1,19 +1,28 @@
-FROM python:3.8.0-slim AS base
+FROM python:3.8.0-slim AS builder
 
-RUN apt-get update \
+
+
+ENV INFRASTRUCTURE="aws"
+ENV PREFECT_AGENT_NAME="AGENT"
+ENV PREFECT_AGENT_TYPE="local"
+ENV PREFECT_CLOUD_TOKEN=""
+ENV PREFECT_AGENT_LABELS=""
+
+
+RUN apt-get update -y \
     && apt-get install tini \
     && if [ "$EXTRA_APT_PACKAGES" ]; then \
-    echo "EXTRA_APT_PACKAGES environment variable found.  Installing." \
-    apt-get update -y \
-    apt-get install -y $EXTRA_APT_PACKAGES \
-    fi \
-    && if [ "$EXTRA_PIP_PACKAGES" ]; then \
-    echo "EXTRA_PIP_PACKAGES environment variable found.  Installing." \
-    pip install --no-cache $EXTRA_PIP_PACKAGES \
-    fi
+        apt-get install -y $EXTRA_APT_PACKAGES; \
+        fi; \
+    if [ "$EXTRA_PIP_PACKAGES" ]; then \
+        pip install --no-cache $EXTRA_PIP_PACKAGES; \
+        fi
 
 
-FROM base as agent
+
+
+FROM builder as agent
+
 
 # install required software
 RUN pip install --no-cache-dir \
@@ -24,10 +33,13 @@ RUN pip install --no-cache-dir \
     "dask-cloudprovider[aws]" \
     "s3fs" \
     "pyarrow==3.0.0" \
-    "tini" 
-
-ENV INFRASTRUCTURE=aws
+    && prefect backend server
+    # && if [ "$PREFECT_AGENT_NAME" ]; then \
+    #     echo "creating agent $PREFECT_AGENT_NAME"; \
+    # else \
+    #     echo "creating agent $PREFECT_AGENT_NAME" export PREFECT_AGENT_NAME=agent; \
+    # fi
 
 
 # ENTRYPOINT / RUN
-ENTRYPOINT ["/usr/bin/tini", "-s", "-g", "--", "prefect agent start"]
+ENTRYPOINT tini -s -g -- prefect agent ${PREFECT_AGENT_TYPE} start --name ${PREFECT_AGENT_NAME} --token ${PREFECT_CLOUD_TOKEN} ${LABELS}
