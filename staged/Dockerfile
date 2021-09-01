@@ -2,29 +2,10 @@ FROM python:3.8.0-slim AS builder
 
 
 
-ENV INFRASTRUCTURE="aws"
-ENV PREFECT_AGENT_NAME="AGENT"
-ENV PREFECT_AGENT_TYPE="local"
-ENV PREFECT_CLOUD_TOKEN=""
-ENV PREFECT_AGENT_LABELS=""
+# Copy bash scripts to trigger a given service
+COPY setup_hard.sh /bin/setup_hard.sh
+COPY setup_agent.sh /bin/setup_agent.sh
 
-
-RUN apt-get update -y \
-    && apt-get install tini \
-    && if [ "$EXTRA_APT_PACKAGES" ]; then \
-        apt-get install -y $EXTRA_APT_PACKAGES; \
-        fi; \
-    if [ "$EXTRA_PIP_PACKAGES" ]; then \
-        pip install --no-cache $EXTRA_PIP_PACKAGES; \
-        fi
-
-
-
-
-FROM builder as agent
-
-
-# install required software
 RUN pip install --no-cache-dir \
     "prefect[aws,github]==0.14.16" \
     "PyGithub" \
@@ -32,14 +13,21 @@ RUN pip install --no-cache-dir \
     "dask[complete]==2021.2.0" \
     "dask-cloudprovider[aws]" \
     "s3fs" \
-    "pyarrow==3.0.0" \
-    && prefect backend server
-    # && if [ "$PREFECT_AGENT_NAME" ]; then \
-    #     echo "creating agent $PREFECT_AGENT_NAME"; \
-    # else \
-    #     echo "creating agent $PREFECT_AGENT_NAME" export PREFECT_AGENT_NAME=agent; \
-    # fi
+    "pyarrow==3.0.0"
 
 
-# ENTRYPOINT / RUN
-ENTRYPOINT tini -s -g -- prefect agent ${PREFECT_AGENT_TYPE} start --name ${PREFECT_AGENT_NAME} --token ${PREFECT_CLOUD_TOKEN} ${LABELS}
+FROM builder as agent
+COPY --from=builder /bin/setup_agent.sh /bin/setup_agent.sh
+
+RUN chmod +x /bin/setup_agent.sh
+
+ENTRYPOINT ["/usr/bin/tini", "-s", "-g", "--", "/bin/setup_agent.sh"]
+# docker build --target agent -t brontomerus/prefect-agent:latest .
+# docker push brontomerus/prefect-agent:latest
+
+FROM builder as hardened
+COPY --from=builder /bin/setup_hard.sh /bin/setup_hard.sh
+
+RUN chmod +x /bin/setup_hard.sh
+
+ENTRYPOINT ["/usr/bin/tini", "-s", "-g", "--", "/bin/setup_hard.sh"]
