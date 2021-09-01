@@ -6,7 +6,9 @@ FROM python:3.8.0-slim AS builder
 COPY setup_hard.sh /bin/setup_hard.sh
 COPY setup_agent.sh /bin/setup_agent.sh
 
-RUN pip install --no-cache-dir \
+RUN apt-get update \
+    && apt-get install tini \
+    && pip install --no-cache-dir \
     "prefect[aws,github]==0.14.16" \
     "PyGithub" \
     "distributed==2021.2.0" \
@@ -31,3 +33,5 @@ COPY --from=builder /bin/setup_hard.sh /bin/setup_hard.sh
 RUN chmod +x /bin/setup_hard.sh
 
 ENTRYPOINT ["/usr/bin/tini", "-s", "-g", "--", "/bin/setup_hard.sh"]
+# docker build --target hardened -t brontomerus/prefect-hardened-server:latest .
+# docker push brontomerus/prefect-hardened-server:latest
